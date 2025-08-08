@@ -10,6 +10,7 @@ using Azure.Storage.Blobs;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using ClosedXML.Excel;
+using Azure;
 
 namespace SAXTech.DocumentConverter
 {
@@ -349,7 +350,7 @@ namespace SAXTech.DocumentConverter
                             var cellValues = new List<string>();
                             foreach (var cell in row.Cells())
                             {
-                                var value = cell.Value?.ToString()?.Trim() ?? "";
+                                var value = cell.Value.ToString()?.Trim() ?? "";
                                 cellValues.Add(value);
                             }
                             
@@ -367,7 +368,7 @@ namespace SAXTech.DocumentConverter
                         {
                             foreach (var cell in row.Cells())
                             {
-                                var value = cell.Value?.ToString()?.ToLower() ?? "";
+                                var value = cell.Value.ToString()?.ToLower() ?? "";
                                 if (value.Contains("quantity") || value.Contains("cost") || 
                                     value.Contains("price") || value.Contains("total") ||
                                     value.Contains("sq ft") || value.Contains("linear ft"))
