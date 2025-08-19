@@ -4,12 +4,17 @@ An Azure Function App that converts various document types (PDF, Word, Excel, Im
 
 ## Features
 
+### Document Conversion
 - **PDF Processing**: Azure Document Intelligence OCR + Layout Analysis
 - **Word Documents**: OpenXML SDK processing for .docx and .doc files
 - **Excel Spreadsheets**: ClosedXML processing for .xlsx and .xls files
 - **Image Processing**: Azure Document Intelligence OCR for PNG, JPEG, TIFF
 - **Construction-Specific Analysis**: Extracts dimensions, costs, quantities, and other construction data
 - **Structured Output**: Organized text with headers, metadata, and analysis sections
+
+### Client Management
+- **DeleteClient**: Completely removes a client and all associated blobs from Azure Storage
+- **ListClientBlobs**: Lists all blobs associated with a specific client for preview
 
 ## API Usage
 

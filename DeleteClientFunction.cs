@@ -1,16 +1,12 @@
-using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+using System.Net;
+using System.Text.Json;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.Json;
 
-namespace SAXTech.ClientManagement
+namespace SAXTech.DocumentConverter
 {
     public class DeleteClientFunction
     {

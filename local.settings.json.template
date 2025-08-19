@@ -1,0 +1,10 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+    "DOCUMENT_INTELLIGENCE_ENDPOINT": "https://your-document-intelligence.cognitiveservices.azure.com/",
+    "DOCUMENT_INTELLIGENCE_KEY": "your-document-intelligence-key",
+    "AZURE_STORAGE_CONNECTION_STRING": "DefaultEndpointsProtocol=https;AccountName=saxtechfcs;AccountKey=your-storage-key;EndpointSuffix=core.windows.net"
+  }
+}
