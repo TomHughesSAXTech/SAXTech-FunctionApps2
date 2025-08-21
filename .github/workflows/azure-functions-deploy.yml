@@ -8,12 +8,11 @@ on:
 
 env:
   AZURE_FUNCTIONAPP_NAME: SAXTech-FunctionApps2
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: '.'
   DOTNET_VERSION: '8.0.x'
 
 jobs:
   build-and-deploy:
-    runs-on: windows-2022
+    runs-on: ubuntu-latest
     
     steps:
     - name: Checkout repository
@@ -24,26 +23,18 @@ jobs:
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
-    - name: Restore dependencies
-      run: dotnet restore
-
-    - name: Build
-      run: dotnet build --configuration Release
-
-    - name: Publish
-      run: dotnet publish -c Release -o ./output
-
-    - name: Create deployment package
-      run: |
-        cd output
-        Compress-Archive -Path * -DestinationPath ../deploy.zip
-        cd ..
-
     - name: Login to Azure
       uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    - name: Deploy to Azure Functions using Azure CLI
+    - name: Install Azure Functions Core Tools
       run: |
-        az functionapp deployment source config-zip --resource-group SAXTech-AI --name ${{ env.AZURE_FUNCTIONAPP_NAME }} --src deploy.zip
+        wget -q https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb
+        sudo dpkg -i packages-microsoft-prod.deb
+        sudo apt-get update
+        sudo apt-get install -y azure-functions-core-tools-4
+
+    - name: Build and Deploy
+      run: |
+        func azure functionapp publish ${{ env.AZURE_FUNCTIONAPP_NAME }} --dotnet-isolated
