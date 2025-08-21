@@ -1,0 +1,82 @@
+[
+  {
+    "name": "ConvertDocument",
+    "scriptFile": "SAXTech-FunctionApps2.dll",
+    "entryPoint": "SAXTech.DocumentConverter.ConvertDocumentFunction.ConvertDocument",
+    "language": "dotnet-isolated",
+    "properties": {
+      "IsCodeless": false
+    },
+    "bindings": [
+      {
+        "name": "req",
+        "direction": "In",
+        "type": "httpTrigger",
+        "authLevel": "Function",
+        "methods": [
+          "post"
+        ],
+        "properties": {}
+      },
+      {
+        "name": "$return",
+        "type": "http",
+        "direction": "Out"
+      }
+    ]
+  },
+  {
+    "name": "DeleteClient",
+    "scriptFile": "SAXTech-FunctionApps2.dll",
+    "entryPoint": "SAXTech.DocumentConverter.DeleteClientFunction.DeleteClient",
+    "language": "dotnet-isolated",
+    "properties": {
+      "IsCodeless": false
+    },
+    "bindings": [
+      {
+        "name": "req",
+        "direction": "In",
+        "type": "httpTrigger",
+        "authLevel": "Function",
+        "methods": [
+          "delete"
+        ],
+        "route": "clients/{clientName}",
+        "properties": {}
+      },
+      {
+        "name": "$return",
+        "type": "http",
+        "direction": "Out"
+      }
+    ]
+  },
+  {
+    "name": "ListClientBlobs",
+    "scriptFile": "SAXTech-FunctionApps2.dll",
+    "entryPoint": "SAXTech.DocumentConverter.DeleteClientFunction.ListClientBlobs",
+    "language": "dotnet-isolated",
+    "properties": {
+      "IsCodeless": false
+    },
+    "bindings": [
+      {
+        "name": "req",
+        "direction": "In",
+        "type": "httpTrigger",
+        "authLevel": "Function",
+        "methods": [
+          "get"
+        ],
+        "route": "clients/{clientName}/blobs",
+        "properties": {}
+      },
+      {
+        "name": "$return",
+        "type": "http",
+        "direction": "Out"
+      }
+    ]
+  }
+]
