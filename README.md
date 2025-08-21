@@ -101,3 +101,4 @@ SAXTech-FunctionApps2/
 ├── host.json                      # Function host configuration
 └── local.settings.json            # Local development settings
 ```
+# Trigger deployment - Thu Aug 21 12:14:47 EDT 2025
