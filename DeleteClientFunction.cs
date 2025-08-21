@@ -60,10 +60,10 @@ namespace SAXTech.DocumentConverter
                     deletionResults.FailedDeletions,
                     deletionResults.Errors);
 
-                // Delete from converted container
+                // Delete from converted container (uses FCS-ConvertedClients prefix)
                 await DeleteClientBlobsFromContainer(
                     CONVERTED_CONTAINER, 
-                    $"FCS-OriginalClients/{clientName}/",
+                    $"FCS-ConvertedClients/{clientName}/",
                     deletionResults.DeletedBlobs,
                     deletionResults.FailedDeletions,
                     deletionResults.Errors);
@@ -210,7 +210,7 @@ namespace SAXTech.DocumentConverter
                 var convertedContainer = _blobServiceClient.GetBlobContainerClient(CONVERTED_CONTAINER);
                 if (await convertedContainer.ExistsAsync())
                 {
-                    var prefix = $"FCS-OriginalClients/{clientName}/";
+                    var prefix = $"FCS-ConvertedClients/{clientName}/";
                     await foreach (var blob in convertedContainer.GetBlobsAsync(prefix: prefix))
                     {
                         allBlobs.Add(new
