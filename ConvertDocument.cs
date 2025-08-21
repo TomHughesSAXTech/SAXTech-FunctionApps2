@@ -39,6 +39,8 @@ namespace SAXTech.DocumentConverter
             {
                 // Parse request body
                 string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+                _logger.LogInformation($"Request body: {requestBody}");
+                
                 var request = JsonSerializer.Deserialize<ConversionRequest>(requestBody, new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true
@@ -49,51 +51,55 @@ namespace SAXTech.DocumentConverter
                     var badResponse = req.CreateResponse(HttpStatusCode.BadRequest);
                     await badResponse.WriteStringAsync(JsonSerializer.Serialize(new
                     {
-                        Success = false,
-                        Error = "BlobUrl and FileName are required"
+                        success = false,
+                        error = "BlobUrl and FileName are required"
                     }));
                     return badResponse;
                 }
 
+                _logger.LogInformation($"Processing file: {request.FileName} from URL: {request.BlobUrl}");
+
                 // Download the file from blob storage
                 var fileData = await DownloadBlobAsync(request.BlobUrl);
+                _logger.LogInformation($"Downloaded {fileData.Length} bytes");
                 
                 // Convert based on file type
                 var convertedContent = await ConvertDocumentByType(fileData, request);
+                _logger.LogInformation($"Converted to {convertedContent.Length} characters");
 
                 // Create response
                 var response = req.CreateResponse(HttpStatusCode.OK);
                 response.Headers.Add("Content-Type", "application/json; charset=utf-8");
 
-                var result = new ConversionResponse
+                // Use lowercase property names for compatibility with n8n
+                var result = new
                 {
-                    Success = true,
-                    FileName = request.FileName,
-                    Client = request.Client,
-                    Category = request.Category,
-                    ConvertedContent = convertedContent,
-                    ConversionMethod = GetConversionMethod(request.MimeType),
-                    ConvertedAt = DateTime.UtcNow,
-                    ConvertedSize = Encoding.UTF8.GetByteCount(convertedContent)
+                    success = true,
+                    fileName = request.FileName,
+                    client = request.Client,
+                    category = request.Category,
+                    convertedContent = convertedContent,
+                    conversionMethod = GetConversionMethod(request.MimeType),
+                    convertedAt = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"),
+                    convertedSize = Encoding.UTF8.GetByteCount(convertedContent),
+                    error = (string?)null
                 };
 
-                await response.WriteStringAsync(JsonSerializer.Serialize(result, new JsonSerializerOptions
-                {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-                }));
+                var jsonResponse = JsonSerializer.Serialize(result);
+                await response.WriteStringAsync(jsonResponse);
 
                 return response;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error converting document");
+                _logger.LogError(ex, "Error converting document: {Message}", ex.Message);
                 
                 var errorResponse = req.CreateResponse(HttpStatusCode.InternalServerError);
                 await errorResponse.WriteStringAsync(JsonSerializer.Serialize(new
                 {
-                    Success = false,
-                    Error = ex.Message,
-                    Timestamp = DateTime.UtcNow
+                    success = false,
+                    error = ex.Message,
+                    timestamp = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss")
                 }));
                 
                 return errorResponse;
@@ -102,8 +108,31 @@ namespace SAXTech.DocumentConverter
 
         private async Task<byte[]> DownloadBlobAsync(string blobUrl)
         {
-            using var httpClient = new HttpClient();
-            return await httpClient.GetByteArrayAsync(blobUrl);
+            try
+            {
+                _logger.LogInformation($"Downloading blob from: {blobUrl}");
+                
+                using var httpClient = new HttpClient();
+                httpClient.Timeout = TimeSpan.FromMinutes(2);
+                
+                var response = await httpClient.GetAsync(blobUrl);
+                
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    _logger.LogError($"Failed to download blob. Status: {response.StatusCode}, Content: {errorContent}");
+                    throw new Exception($"Failed to download blob: {response.StatusCode}");
+                }
+                
+                var data = await response.Content.ReadAsByteArrayAsync();
+                _logger.LogInformation($"Successfully downloaded {data.Length} bytes");
+                return data;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error downloading blob from {blobUrl}");
+                throw;
+            }
         }
 
         private async Task<string> ConvertDocumentByType(byte[] fileData, ConversionRequest request)
